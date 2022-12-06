@@ -1,3 +1,21 @@
+// another aproach with object
+
+const myGameArea = {
+  canvas: document.querySelector("#canvas"),
+  start: function () {
+    this.canvas.width = this.width; //already done in html
+    this.canvas.height = this.height; //already done in html
+    this.ctx = canvas.getContext("2d");
+    // call updateGameArea() every 20 milliseconds
+    this.interval = setInterval(updateGameArea, 20);
+  },
+  clear: function () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  },
+};
+
+// Class approach
+
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
@@ -68,13 +86,62 @@ class Car {
   move(event) {
     switch (event) {
       case "ArrowRight":
-        if (this.posX <= 476) this.moveRight();
+        if (this.posX <= 410) this.moveRight();
         break;
       case "ArrowLeft":
-        if (this.posX >= 23) this.moveLeft();
+        if (this.posX >= 90) this.moveLeft();
         console.log(this.posX);
         break;
     }
+  }
+}
+
+class MyObstacles {
+  constructor(width, height, color, posX, posY) {
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.posX = posX;
+    this.posY = posY;
+    // new speed properties
+    this.speedX = 0;
+    this.speedY = 0;
+    this.element = this.createObstacles();
+  }
+
+  newPos() {
+    this.posX += this.speedX;
+    this.posY += this.speedY;
+  }
+
+  createObstacles() {
+    const element = new Image();
+    element.src = "./images/snowball-1.png";
+    ctx.drawImage(element, this.posX, this.posY, this.width, this.height);
+    return element;
+  }
+  drawObstacles() {
+    ctx.drawImage(this.element, this.posX, this.posY, this.width, this.height);
+  }
+}
+
+let time = 0;
+
+let obstacles = [];
+function updateObstacles() {
+  for (i = 0; i < obstacles.length; i++) {
+    //to move the obstacles, just adding sth to the y axis. To make it more difficult, we need add more
+    obstacles[i].posY += 1;
+    obstacles[i].drawObstacles();
+  }
+  time++;
+  if (time % 400 === 0) {
+    let x = 430;
+    let minGap = 0;
+    let maxGap = 330;
+    let gap = Math.floor(Math.random() * (maxGap + minGap - 1) + minGap);
+    obstacles.push(new MyObstacles(100, 100, gap, -100));
+    // console.log(obstacles);
   }
 }
 
@@ -84,6 +151,10 @@ window.onload = () => {
     game.startGame();
     document.addEventListener("keydown", (e) => {
       game.player.move(e.key);
+    });
+    document.addEventListener("keyup", (e) => {
+      this.player.speedX = 0;
+      this.player.speedY = 0;
     });
     // console.log("started");
   };
